@@ -2,3 +2,9 @@
 _site
 .sass-cache
 Gemfile.lock
+
+# IDEA
+.idea
+
+# VSCode
+.vscode

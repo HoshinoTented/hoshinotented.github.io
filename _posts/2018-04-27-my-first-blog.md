@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: post
 title: 我的第一篇博客 On Jekyll
 ---
 
