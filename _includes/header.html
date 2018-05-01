@@ -1,6 +1,14 @@
 <header class="site-header">
-  <div class="wrapper">
-    <a class="site-title" href="{{ site.baseurl }}/">{{ site.title }}</a>
-    <p class="description">{{ site.description }}</p>
-  </div>
+	<div class="wrapper">
+		<a class="site-title" href="{{ site.baseurl }}/">{{ site.title }}</a>
+		<p class="description">{{ site.description }}</p>
+
+		<div class="trigger">
+			{% for my_page in site.pages %}
+			{% if my_page.special %}
+			<a class="site-title about" href="{{ my_page.url | prepend: site.baseurl }}">{{ my_page.title }}</a>
+			{% endif %}
+			{% endfor %}
+		</div>
+	</div>
 </header>
