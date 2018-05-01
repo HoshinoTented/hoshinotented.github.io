@@ -14,7 +14,7 @@ title: 本小姐的GitHub惨遭盗用!?
 
 # 究竟是什么导致了我的GitHub账号密码失效呢?!
 不滋道, 对于我这种<del>懒</del>安全意识薄弱的人来说  
-我似不会去找到背后的真相的!
+我似不会去找到背后的[真相](https://raw.githubusercontent.com/HoshinoTented/hoshinotented.github.io/master/_includes/github-password-reset.png)的!
 
 # 写在后面
 没了
