@@ -1,6 +1,7 @@
 ---
 layout: post
 title: 本小姐的GitHub惨遭盗用!?
+post: YES!
 ---
 
 # 这么过分一定要单独发一篇博客

@@ -1,6 +1,7 @@
 ---
 layout: post
 title: 我可能不太适合做前端
+post: YES!
 ---
 
 # 为什么?

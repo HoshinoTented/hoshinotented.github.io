@@ -1,6 +1,7 @@
 ---
 layout: post
 title: 我的第一篇博客 On Jekyll
+post: YES!
 ---
 
 # Jekyll?

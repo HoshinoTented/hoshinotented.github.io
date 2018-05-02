@@ -1,6 +1,7 @@
 ---
 layout: post
 title: 软件层 =解决=> 硬件层.问题
+post: YES!
 ---
 
 # 先夸自己一下
