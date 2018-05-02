@@ -1,0 +1,19 @@
+---
+layout: dream
+---
+
+<div class="home">
+	<h1 class="page-heading">我的梦境s</h1>
+	<ul class="post-list">
+		{% for post in site.posts %}
+		{% if post.dream %}
+		<li>
+			<span class="post-meta">{{ post.date | date: "%Y %m %d" }}</span>
+			<h2>
+				<a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+			</h2>
+		</li>
+		{% endif %}
+		{% endfor %}
+	</ul>
+</div>
