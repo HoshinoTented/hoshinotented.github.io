@@ -66,7 +66,7 @@ Yes Yes Yes!!!
 # 启动第一个 IntelliJ 插件
 激动人心的时刻到了!!  
 打开右侧的 `Gradle`  
-<项目名> -> Tasks -> intellij  
+\<项目名\> -\> Tasks -\> intellij  
 找到 `runIde` 这个 `task` 并运行它  
 接着, 将会出现一个沙盒版的 `IntelliJ IDEA`  
 随便打开一个 `Project`  
