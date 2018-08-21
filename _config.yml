@@ -1,7 +1,7 @@
 title: 极寒之域--雾之湖
 author: HoshinoTented
 keywords: HoshinoTented, blog, cirno
-twitter: LimbolRain
+twitter: 不告诉你
 email: limbolrain@gmail.com
 description: >
   Hoshi no Blog
@@ -9,7 +9,7 @@ baseurl: ""
 url: "http://www.tented.top"
 github_username: HoshinoTented
 markdown: kramdown
-domain: tented.top
+domain: hoshino9.org
 repository: https://github.com/HoshinoTented/hoshinotented.github.io
 repository_name: hoshinotented.github.io
 paginate: 9
