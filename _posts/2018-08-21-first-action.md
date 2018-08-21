@@ -76,5 +76,5 @@ Yes Yes Yes!!!
 是不是出现了 `Hello world!`  
 ![](https://raw.githubusercontent.com/HoshinoTented/hoshinotented.github.io/master/_includes/first-action-hello-world.png)  
 或者打开一个文件, 右键  
-是不是看到了 `Say Hello           Alt+H`  
+是不是看到了 `Say Hello`  
 点击它也可以让这个 `Action` 被触发
