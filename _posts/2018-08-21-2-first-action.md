@@ -24,9 +24,9 @@ public class HelloAction extends AnAction {
 咱们先看看这儿
 ```Java
 @Override
-	public void actionPerformed(AnActionEvent e) {
-		System.out.println("Hello world!");
-	}
+public void actionPerformed(AnActionEvent e) {
+	System.out.println("Hello world!");
+}
 ```
 看名字就知道了嘛, 就是 `Action` 被触发时所执行的东西  
 星野这里写了 打印一句 "Hello world!"  

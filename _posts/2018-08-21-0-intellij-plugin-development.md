@@ -25,6 +25,6 @@ post: YES!
 那么~ 编写一个 IntelliJ 插件需要以下物品  
 * 安装有 [JDK JRE](https://oracle.com) 的计算机 一台 \( 如果手机上装了什么[黑科技](https://termux.com/)可以编译的话也不是不可以
 * [Gradle](https://gradle.org) 一个
-* [IntelliJ](https://www.jetbrains.com/idea/) IDEA 一枚
+* [IntelliJ](https://www.jetbrains.com/idea/) IDEA 一枚 \( `Community` 版本就满足开发需求了
 * JVM语言 一只以上
 * 没了

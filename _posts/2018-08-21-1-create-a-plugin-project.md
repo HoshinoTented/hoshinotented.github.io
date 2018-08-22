@@ -53,7 +53,9 @@ intellij {
     //请根据自己的实际情况改变字符串的内容哦
 }
 
-//不懂, 不过好像可以删掉
+//plugin.xml的一些修改
+//比如 `changeNotes` 就是 `change-notes` 节点的东西
+//`pluginDescription` 就是 `description` 节点的东西
 patchPluginXml {
     changeNotes """
       Add change notes here.<br>
