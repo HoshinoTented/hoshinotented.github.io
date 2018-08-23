@@ -26,7 +26,7 @@ class HoshinoSetting {
 public class HoshinoModuleBuilder extends ModuleBuilder {
 	public HoshinoSetting setting = new HoshinoSetting();
 	
-    @Override
+	@Override
 	public void setupRootModel(ModifiableRootModel modifiableRootModel) throws ConfigurationException {
 		doAddContentEntry(modifiableRootModel);
 		ContentEntry entry = modifiableRootModel.getContentEntries()[0];
@@ -40,11 +40,11 @@ public class HoshinoModuleBuilder extends ModuleBuilder {
 	
 	/*...*/
 	
-    @Nullable
-    @Override
-    public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable) {
-    	return new HoshinoModuleWizard(this);
-    }
+	@Nullable
+	@Override
+	public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable) {
+		return new HoshinoModuleWizard(this);
+	}
 }
 ```
 
