@@ -5,7 +5,7 @@ post: YES!
 ---
 
 # 第一个 Action
-在 `src/main/java` 目录下创建一个 `actions` 目录  
+在 `src/main/java` 目录下创建一个 `action` 目录  
 这个目录就是专门放 `Action` 的地方啦  
 接下来, 创建一个文件  
 嗯。。叫什么呢。。。  

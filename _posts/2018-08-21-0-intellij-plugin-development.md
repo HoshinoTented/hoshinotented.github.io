@@ -28,3 +28,13 @@ post: YES!
 * [IntelliJ](https://www.jetbrains.com/idea/) IDEA 一枚 \( `Community` 版本就满足开发需求了
 * JVM语言 一只以上
 * 没了
+
+# 战斗数据
+推荐的几个开源的 `IntelliJ Platform Plugin` 项目  
+使用语言: 
+* Kotlin
+    * [EmmyLua](https://github.com/EmmyLua/IntelliJ-EmmyLua)
+    * [Julia-IntelliJ](https://github.com/ice1000/julia-intellij) 目前功能不是很完整  
+    * [Rust-IntelliJ](https://github.com/intellij-rust/intellij-rust)  
+* Java
+    * ~~实在是找不到有Java的优秀开源插件~~
