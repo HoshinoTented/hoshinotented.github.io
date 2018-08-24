@@ -19,7 +19,7 @@ class HoshinoSetting {
 
 # 把 ModuleWizard 的数据传给 ModuleBuilder
 其实这个很简单的啦  
-**这些内容只是实例而已, 并不一定需要这样写哦**  
+**这些内容只是示例而已, 并不一定需要这样写哦**  
 ~~先把上次弄上的50个界面删掉再说。。~~  
 修改: `HoshinoModuleBuilder.java`  
 ```Java
