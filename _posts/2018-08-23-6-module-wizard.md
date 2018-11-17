@@ -25,7 +25,7 @@ post: YES!
 
 嗯。。。星野创建了一个这样的[界面](https://github.com/HoshinoTented/UnknownPlugin/blob/master/src/main/java/org/hoshino9/intellijplugin/module/ui/HoshinoModuleWizardUI.form)  
 长这样的啦  
-![](https://github.com/HoshinoTented/hoshinotented.github.io/blob/master/resources/module-wizard-ui.png?raw=true)  
+![](https://github.com/HoshinoTented/Resources/blob/master/module-wizard-ui.png?raw=true)  
 创建界面的同时, 如果没有自己设置对应的类名的话, 是会创建一个同名的类的  
 看起来像这样  
 ```Java
@@ -79,7 +79,7 @@ public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable p
 ```
 `getCustomOptionsStep` 是自定义了 Module 创建的 **第一个界面**  
 启动 IDE 之后, 在创建 Module 的界面, 会看到像这样的东西  
-![](https://github.com/HoshinoTented/hoshinotented.github.io/blob/master/resources/module-wizard-home.png?raw=true)  
+![](https://github.com/HoshinoTented/Resources/blob/master/module-wizard-home.png?raw=true)  
 但是如果不想要在第一个界面要怎么办呢。。  
 翻阅源码, 会发现一个这样的方法  
 ```Java

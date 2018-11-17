@@ -32,7 +32,7 @@ public void actionPerformed(AnActionEvent e) {
 星野这里写了 打印一句 "Hello world!"  
 <del>果然学什么都要先学 "Hello world!"</del>  
 如果按照正常设置的话, 这个类的名字会泛黄(警告)  
-![](https://raw.githubusercontent.com/HoshinoTented/hoshinotented.github.io/master/resources/first-action-class-warning.png)   
+![](https://raw.githubusercontent.com/HoshinoTented/Resources/master/first-action-class-warning.png)   
 Yes Yes Yes!!!  
 只写了 `Action`, 还没有告诉 `IDEA` 如何去触发这个 `Action` 呢  
 
@@ -74,7 +74,7 @@ Yes Yes Yes!!!
 按下 `Alt H`  
 再回头看看运行输出  
 是不是出现了 `Hello world!`  
-![](https://raw.githubusercontent.com/HoshinoTented/hoshinotented.github.io/master/resources/first-action-hello-world.png)  
+![](https://raw.githubusercontent.com/HoshinoTented/Resources/master/first-action-hello-world.png)  
 或者打开一个文件, 右键  
 是不是看到了 `Say Hello`  
 点击它也可以让这个 `Action` 被触发
