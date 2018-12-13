@@ -30,22 +30,22 @@ QAQ
 ![](https://github.com/HoshinoTented/Resources/blob/master/merging_sort/sorting_partition.png?raw=true)
 接着, 把 第一个数组(红色) 和 第二个数组(淡橙色) 合并  
 首先, 把<span style="color: #FF9696;">红色数组</span>的第一个元素和<span style="color: #FFD696;">淡橙色数组</span>的第一个元素进行比较, 把较小的移动到<span style="color: #FF0000;">新数组</span>里  
-![](https://github.com/HoshinoTented/blob/master/merging_sort/sorting_merge0.png?raw=true)  
+![](https://github.com/HoshinoTented/Resources/blob/master/merging_sort/sorting_merge0.png?raw=true)  
 接着, 发现<span style="color: #FF9696;">红色数组</span>已经没有元素了, 那么就将<span style="color: #FFD696;">淡橙色数组</span>里的元素全部移动到<span style="color: #FF0000;">新数组</span>里  
-![](https://github.com/HoshinoTented/blob/master/merging_sort/sorting_merge1.png?raw=true)  
+![](https://github.com/HoshinoTented/Resources/blob/master/merging_sort/sorting_merge1.png?raw=true)  
 最后将<span style="color: #FF0000;">新数组</span>的所有元素复制回去  
-![](https://github.com/HoshinoTented/blob/master/merging_sort/sorting_merge2_copy.png?raw=true)  
+![](https://github.com/HoshinoTented/Resources/blob/master/merging_sort/sorting_merge2_copy.png?raw=true)  
 这样子, 第一对数组就变得有序了  
 接着就是要把 第三个数组(橙色) 和 第四个数组 (稍微淡那么一点点的橙色) 合并  
 这个过程也是差不多的, 最后合并完成是这个样子  
-![](https://github.com/HoshinoTented/blob/master/merging_sort/sorting_merge5_copy.png?raw=true)  
+![](https://github.com/HoshinoTented/Resources/blob/master/merging_sort/sorting_merge5_copy.png?raw=true)  
 接下来, 就要把 <span style="color: #FF0000;">红色数组</span> 和 <span style="color: #FF8000">橙色数组</span> 合并  
 首先, 将 <span style="color: #FF0000;">红色数组</span> 的第一个元素 3 和 <span style="color: #FF8000">橙色数组</span> 的第一个元素 5 比较  
 3 \< 5, 则将 3 移动到新数组中  
 接着, 将 <span style="color: #FF0000;">红色数组</span> 的第一个元素(事实上是第二个元素, 但是因为第一个元素被删除了) 44 和 <span style="color: #FF8000">橙色数组</span> 的第一个元素 5 比较  
 44 \> 5, 则将 5 移动到新数组中  
 这么循环下去, 这两个数组最终会被合并成这样子  
-![](https://github.com/HoshinoTented/blob/master/merging_sort/sorting_merge8_copy.png?raw=true)  
+![](https://github.com/HoshinoTented/Resources/blob/master/merging_sort/sorting_merge8_copy.png?raw=true)  
 再这么继续下去, 所有的数组都会被合并成一个有序的数组  
 这就是 **归并排序**  
 
