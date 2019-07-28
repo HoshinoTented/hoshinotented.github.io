@@ -30,14 +30,76 @@ instance Monad IO -- Defined in ‘GHC.Base’
 ```
 最重要的是 `(>>=)` 和 `return`  
 `return` 用于接收一个值，并把这个值包装进 `Monad` 里  
-`(>>=)` 用于取出值，并把值应用到传入的函数，然后返回函数的结果  
+`(>>=)` 用于取出值，并把值应用到传入的函数，然后返回一个新的 Monad  
 但无论是 `return` 还是 `(>>=)`  
 它们都不能把值从 `Monad` 中取出并返回  
 这也就意味着，如果一个值进入了 `Monad`，就再也无法通过 `Monad` 提供的操作出来了。。。  
 而 `Monad` 的这个特性，恰好也是 `IO Monad` 的本质  
 一旦函数中使用了 `IO Monad`，那么这个函数的返回值也一定会带有 `IO Monad`  
 所以也就能区分纯函数和不纯函数了  
-Haskell 还提供了一个语法糖: `do`  
+
+## 何为 (>>=)
+`(>>=)` 读作 bind  
+bind 是 Monad 中最重要的操作，Monad 定义中的 `{-# MINIMAL (>>=) #-}` 代表了实现 Monad 至少要实现 `(>>=)` 这个函数  
+我们首先看看 `(>>=)` 的函数签名  
+```haskell
+> :t (>>=)
+(>>=) :: Monad m => m a -> (a -> m b) -> m b
+```
+它意为 接收一个 `Monad`，进行一次运算，然后再返回一个 `Monad`  
+但要如何使用 `(>>=)` 呢  
+让我们先看看 `putStrLn` (用于输出字符串，下面会提到)  
+```haskell
+> :i putStrLn
+putStrLn :: String -> IO ()
+```
+它接收一个 `String`，然后返回一个 `IO ()`  
+不过 `IO` 这个类型实现了 `Monad`  
+我们这样调用 `putStrLn`  
+```haskell
+> putStrLn "qwq"
+qwq
+```
+但我们想要在一条语句里调用两次 `putStrLn`  
+要怎么做呢？  
+答案是: 使用 `(>>=)`  
+首先，我们先分别调用两次 `putStrLn`  
+```haskell
+> putStrLn "one"
+one
+> putStrLn "two"
+two
+```
+然后使用 `(>>=)` 把这两个操作连接起来  
+```haskell
+> putStrLn "one" >>= \_ -> putStrLn "two"
+one
+two
+```
+或者直接使用 `(>>)`  
+```haskell
+> putStrLn "one" >> putStrLn "two"
+one
+two
+```
+还可以调用更多次的 `putStrLn`  
+```haskell
+> :{
+| printN :: Int -> String -> IO ()
+| printN 0 _ = return ()
+| printN n str = putStrLn str >> printN (n - 1) str
+| :}
+> printN 5 "qwq"
+qwq
+qwq
+qwq
+qwq
+qwq
+```
+Monad 的 `(>>=)` 可以用来进行连续的计算  
+也使得 纯函数式的 Haskell 可以以命令式的方式来编写程序  
+
+Haskell 还为 `(>>=)` 提供了一个语法糖: `do`  
 比如:  
 ```haskell
 main :: IO ()
@@ -51,7 +113,7 @@ main = do
     s <- getLine
     putStrLn s
 ```
-在更加复杂的情况下， `do` 会显得更简洁  
+这样就显得更加命令式了  
 
 ## 输出
 你可以使用这两个函数来输出: `putStrLn` 和 `print`  
@@ -418,8 +480,8 @@ main = do
 输出了 0  
 时间复杂度是 $O(1)$
 
-### 修改 Vector
-可变 `Vector` 可以使用 `write` 函数来进行随机修改  
+### 写入 Vector
+可变 `Vector` 可以使用 `write` 函数来进行随机写入  
 ```haskell
 main :: IO ()
 main = do
@@ -432,6 +494,22 @@ main = do
     return ()
 ```
 输出了 1  
+时间复杂度是 $O(1)$
+
+### 修改 Vector
+可变 `Vector` 可以使用 `modify` 函数来进行修改  
+```haskell
+main :: IO ()
+main = do
+    vec <- MV.new 5 :: IO (IOVector Int)
+
+    MV.modify vec (+1) 0    -- 对 vec 中下标为 0 的元素应用 (+1) 函数
+    v <- MV.read vec 0      -- 读取 vec 中下标为 0 的元素
+    print v
+
+    return ()
+```
+输出了 1
 时间复杂度是 $O(1)$
 
 ### 扩容 Vector
