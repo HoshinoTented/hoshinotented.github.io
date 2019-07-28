@@ -11,18 +11,15 @@ post: YES!
 数据类型通常用 `data` 和 `newtype` 关键字定义  
 接下来，我们首先介绍 `data`  
 
-## Haskell 中的枚举类型
-Haskell 中有两种数据类型，一种是 枚举类型，另一种是 构造类型，同时这两种类型也可以互相结合，成为更强大的类型  
-首先介绍枚举类型  
-枚举类型和 C/C++ 中的 `enum` 类似，就是一个个枚举出这个类型的值  
-比如 Haskell 标准库中的 `Bool`  
+## 枚举类型
+枚举类型，顾名思义，就是一个一个枚举出类型的值，与 C/C++ 中的 `enum` 类似，但功能更为强大  
+让我们看看枚举类型是如何定义的，比如 Haskell 标准库中的 `Bool`
 ```haskell
 DataType> :i Bool
 data Bool = False | True        -- Defined in ‘GHC.Types’
 ```
-
-`Bool` 有两个值，分别是 `False` 和 `True`  
-它们中间被 `|` 分隔开，这个 `|` 便是枚举类型的分隔符  
+`Bool` 类型有两个值，分别的是 `False` 和 `True`  
+它们被 `|` 隔开，而 `|` 便是枚举类型的分隔符
 
 ## 自定义枚举类型
 我们照壶画瓢，试着定义一个属于自己的枚举类型  
@@ -40,7 +37,10 @@ DataType> Mon
 ```
 它报错了，为什么？  
 错误信息表示我们的 `Day` 类型没有实现 `Show` 类型类  
-因此不知道如何显示它  
+
+> Q: 什么是类型类？什么又是 `Show`？  
+> A: 啊。。这个以后再讲。。现在只需要知道 `Show` 类型类是用来将数据转化为字符串的 (即显示这个数据)
+
 最简单的修复方法是使用 `deriving`  
 
 把我们自定义的数据类型修改成这样  
@@ -49,34 +49,45 @@ data Day = Sun | Mon | Tue | Wed | Thu | Fri | Sat deriving (Show)
 ```
 这样表示让 Haskell 使用默认实现来让我们的 Day 实现 Show  
 然后再在 GHCi 中输入 `Mon`  
-```
+```haskell
 DataType> Mon
 Mon
 ```
 GHCi 很成功地输出了 `Mon`  
 
-## Haskell 中的构造类型
-刚才除了枚举类型，还说到了构造类型  
-构造类型看起来是这样的  
+## 只有一个枚举值的枚举类型  
+这看起来很莫名其妙，但还是先慢慢看下去吧  
+枚举类型的枚举值可以只有一个，也可以和类型重名  
+像这样  
 ```haskell
--- People Name Age
+data People = People
+```
+但它目前好像还不能被用来做什么  
+我们给它加点东西
+
+## 带有参数的枚举类型
+Haskell 的枚举类型可以携带参数，就像这样  
+```haskell
+--                   Name   Age
 data People = People String Int deriving (Show)
 ```
-
-在 GHCi 中输入 `:t People` 看看会发生什么  
-```
-DataType> :t People
-People :: String -> Int -> People
-```
-
-它输出了 `People` 函数的类型，这个函数接收 String, Int 最后返回一个 People  
-这和我们定义的 `People String Int` 差不多  
-试着输入 `People "Hoshino" 4`:  
-```
+然后可以通过这样的方法构造一个 `People` 值
+```haskell
 DataType> People "Hoshino" 4
 People "Hoshino" 4
 ```
-GHCi 很成功地构造了一个 People 类型的值，并打印了出来  
+我们构造出了一个 People 类型的值，并把它输出了！
+当然也可以有很多个带有参数的枚举类型  
+```haskell
+data Shape = Square Int Int | Cirlce Int
+```
+
+但这个。。 `People` 类型的构造怎么有点像函数调用呢。。  
+```haskell
+DataType> :t People
+People :: String -> Int -> People
+```
+天哪， `People` 居然是一个函数
 
 ## 模式匹配
 那要如何取出构造类型中的值呢  
@@ -95,6 +106,7 @@ DataType> getName (People "Hoshino" 4)
 函数很正确地取出了 `"Hoshino"`  
 但这样也有一个坏处，一旦构造类型内的值非常多，手写就不太现实了  
 于是我们可以通过修改类型的定义来做到这一点  
+**Record 语法**  
 ```haskell
 data People = People {
     name :: String,
@@ -103,14 +115,30 @@ data People = People {
 ```
 
 然后在 GHCi 中:  
-```
+```haskell
 DataType> name (People "Hoshino" 4)
 "Hoshino"
 ```
 这样很棒，Haskell 自动帮我们生成了类似于 `getName` 的函数  
+使用 Record 语法时，可以使用另一种模式匹配的方法  
+```haskell
+getName' :: People -> String
+getName' (People {name = n}) = n
+```
+我们看到这里并没有匹配 `age`，但 GHCi 也没有报错，这说明使用这种写法的时候，可以选择性地匹配  
+你还能通过这样来构造新值  
+```haskell
+updateName :: People -> String -> People
+updateName p n = p { name = n }
+```
+这样的代码等价于  
+```haskell
+updateName' :: People -> String -> People
+updateName' (People _ age) n = People n age
+```
 
 ## 参数化类型
-参数化类型基于构造类型，它额外接收几个 类型参数，使得我们的构造类型可以存放各种类型的数据  
+你还可以给类型传递 **类型参数**，使得我们的构造类型可以存放各种类型的数据  
 比如 Haskell 标准库中常用的 `Maybe`:  
 ```haskell
 DataType> :i Maybe
@@ -238,7 +266,8 @@ DataType> :t 1 :: Integer
     ```
     `Int` 也实现了 `Integral` 类型类，这样传入一个 `Int` 值就能返回一个相应的 `Integer` 了
 
-不过，`Integer` 毕竟不是原生类型，效率与原生的 `Int` 和 `Word` 还是有一定差距  
+但是，`Integer` 毕竟不是原生类型，效率与原生的 `Int` 和 `Word` 还是有一定差距  
+不过，我再也不用手敲高精度啦哈哈哈哈哈哈哈哈哈哈哈哈嗝  
 
 ## 列表  
 在 GHCi 中输入:  
@@ -260,7 +289,7 @@ data List a = Empty | Cons a (List a) deriving (Show)
 很容易看出 Haskell 的列表其实是链表实现  
 
 关于 Haskell 的列表定义，要注意的是 `[]` 是 Haskell 内置的列表符号  
-所以我们自己是无法定义出名为 [] 的列表的  
+所以我们自己是无法定义出名为 `[]` 的列表的  
 而关于 `(:)` 这个构造器名称，我们也是可以定义出类似的构造器  
 例如:  
 ```haskell
