@@ -99,8 +99,8 @@ qwq
 ## Text
 Haskell 自带的 `String` 效率低下，这使得我们需要使用更高效的 `String`，即 Data.Text  
 ```haskell
-> import qualified Data.Text as T
-> import qualified Data.Text.IO as TIO
+import qualified Data.Text as T
+import qualified Data.Text.IO as TIO
 ```
 `Data.Text` 是 text 本体  
 `Data.Text.IO` 提供了关于 `Text` 的 IO 操作  
@@ -114,7 +114,7 @@ Haskell 自带的 `String` 效率低下，这使得我们需要使用更高效�
 ## 读入优化
 使用 `read` 来转换数据实在是太慢了，这使得我们需要自己写一个转换器  
 ```haskell
--- Parse Int :: Source -> Count -> Result
+-- Parse Int :: Count -> Source -> Result
 parseInt :: Int -> String -> Int
 parseInt n [] = n
 parseInt n (char:str) = parseInt (n * 10 + (ord char - ord '0')) str
@@ -126,6 +126,106 @@ main = do
 ```
 
 这样，我们就完成了 Haskell 中的读入优化  
+
+# 基础操作
+一些基础内容可以看 [洛谷日报的 #188 期](https://www.luogu.org/blog/i-love-illya/haskell-ru-men-yu-fa-shou-ce)
+
+## 数值运算
+首先讲解对数值的操作  
+比如 `+-*/`  
+首先是 `(+) (-) (*)`  
+```haskell
+> :i Num
+class Num a where
+  (+) :: a -> a -> a
+  (-) :: a -> a -> a
+  (*) :: a -> a -> a
+
+  -- ...
+```
+
+它们都被定义在了 `Num` 类型类里  
+```haskell
+> 1 + 2
+2
+> 1 - 2
+-1
+> 1 * 2
+2
+```
+
+接下来是 `(/)`  
+但是如果我们看一下 `(/)` 的定义。。。  
+```haskell
+class Num a => Fractional a where
+  (/) :: a -> a -> a
+  ...
+        -- Defined in ‘GHC.Real’
+infixl 7 /
+```
+需要 `Fractional` 类型类，我们再看看 `Fractional` 类型类的定义  
+```haskell
+> :i Fractional
+class Num a => Fractional a where
+  (/) :: a -> a -> a
+  -- ...
+instance Fractional Float -- Defined in ‘GHC.Float’
+instance Fractional Double -- Defined in ‘GHC.Float’
+```
+只有 `Float` 和 `Double` 实现了 `Fractional` 类型类  
+这就意味着，我们不能对 `Int` 使用 `(/)` 函数了！  
+
+但我们可以使用 `div`  
+```haskell
+> :i div
+class (Real a, Enum a) => Integral a where
+  div :: a -> a -> a
+infixl 7 `div`
+> :i Integral
+class (Real a, Enum a) => Integral a where
+  div :: a -> a -> a
+instance Integral Int -- Defined in ‘GHC.Real’
+```
+于是可以这样进行除操作  
+```haskell
+> div 5 2
+2
+```
+或者将 `div` 函数放在中间  
+```haskell
+> 5 `div` 2
+2
+```
+
+## 位运算
+位运算也是 OI 中很重要的知识  
+Haskell 的位运算函数都包含在了 Data.Bits 包中  
+```haskell
+import Data.Bits
+```
+使用 `(.&.) (.|.)` 和 `xor` 来进行 且 或 异或 操作
+```haskell
+> 2 .&. 1
+0
+> 2 .|. 1
+3
+> 2 `xor` 1
+3
+```
+使用 `shiftL` 和 `shiftR` 来进行位移  
+```haskell
+> 1 `shiftL` 9
+512
+> 512 `shiftR` 9
+1
+```
+你甚至可以定义一个 `(<<)` 运算符  
+```haskell
+> (<<) = shiftL
+> 1 << 9
+512
+```
+不过要注意的是，`(>>)` 被 Monad 使用了，定义 `(>>)` 运算符之前记得先隐藏 Prelude 中的 `(>>)` 运算符  
 
 # 数组  
 虽然 Haskell 有内置的 Data.Array，但性能和易用性方面还是太差了  
@@ -520,6 +620,9 @@ Hoogle 是 Haskell 生涯中很重要的工具
 [Hoogle](https://hoogle.haskell.org/) 是 Haskell 官方的函数文档  
 你可以在这里面查找函数的签名和用法，包括源代码实现  
 或者查找各种各样的依赖库  
+
+# 更多
+如果对文章内容有疑惑~~，或者想喷我菜的~~，都可以在评论区留言，我会尽可能回复  
 
 ---------------------------
 参考: [并查集讨论](https://www.luogu.org/discuss/show/125819)
