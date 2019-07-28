@@ -13,7 +13,7 @@ post: YES!
 # IO Monad
 Haskell 是纯函数式语言，但 OI 中经常涉及读入输出操作，这些都是不纯的，应该怎么办呢  
 Haskell 给出了解决方案：`IO Monad`  
-## Monad
+## 浅谈 Monad
 要理解 `IO Monad`，首先就要知道什么是 `Monad`  
 那什么是 `Monad` 呢？  
 让我们看看 `Monad` 的定义:  
