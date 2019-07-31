@@ -10,9 +10,185 @@ post: YES!
 这篇文章将带你愉快地在 OI 中使用 Haskell  
 ~~当然是仅限练习，考场上可是没有 Haskell 的~~  
 
+# 基础操作
+一些基础内容可以看 [洛谷日报的 #188 期](https://www.luogu.org/blog/i-love-illya/haskell-ru-men-yu-fa-shou-ce)
+
+## 数值运算
+首先讲解对数值的操作  
+比如 `+-*/`  
+首先是 `(+) (-) (*)`  
+```haskell
+> :i Num
+class Num a where
+  (+) :: a -> a -> a
+  (-) :: a -> a -> a
+  (*) :: a -> a -> a
+
+  -- ...
+```
+
+它们都被定义在了 `Num` 类型类里  
+```haskell
+> 1 + 2
+2
+> 1 - 2
+-1
+> 1 * 2
+2
+```
+
+接下来是 `(/)`  
+但是如果我们看一下 `(/)` 的定义。。。  
+```haskell
+class Num a => Fractional a where
+  (/) :: a -> a -> a
+  ...
+        -- Defined in ‘GHC.Real’
+infixl 7 /
+```
+需要 `Fractional` 类型类，我们再看看 `Fractional` 类型类的定义  
+```haskell
+> :i Fractional
+class Num a => Fractional a where
+  (/) :: a -> a -> a
+  -- ...
+instance Fractional Float -- Defined in ‘GHC.Float’
+instance Fractional Double -- Defined in ‘GHC.Float’
+```
+只有 `Float` 和 `Double` 实现了 `Fractional` 类型类  
+这就意味着，我们不能对 `Int` 使用 `(/)` 函数了！  
+
+但我们可以使用 `div`  
+```haskell
+> :i div
+class (Real a, Enum a) => Integral a where
+  div :: a -> a -> a
+infixl 7 `div`
+> :i Integral
+class (Real a, Enum a) => Integral a where
+  div :: a -> a -> a
+instance Integral Int -- Defined in ‘GHC.Real’
+```
+于是可以这样进行除操作  
+```haskell
+> div 5 2
+2
+```
+或者将 `div` 函数放在中间  
+```haskell
+> 5 `div` 2
+2
+```
+
+最后是取模  
+```haskell
+> :t mod
+mod :: Integral a => a -> a -> a
+> 3 `mod` 2
+1
+```
+Haskell 并没有提供 `(%)` 运算符，不过你可以自己定义  
+```haskell
+> (%) = mod
+> 3 % 2
+1
+```
+
+## 位运算
+位运算也是 OI 中很重要的知识  
+Haskell 的位运算函数都包含在了 Data.Bits 包中  
+```haskell
+import Data.Bits
+```
+使用 `(.&.) (.|.)` 和 `xor` 来进行 且 或 异或 操作
+```haskell
+> 2 .&. 1
+0
+> 2 .|. 1
+3
+> 2 `xor` 1
+3
+```
+使用 `shiftL` 和 `shiftR` 来进行位移  
+```haskell
+> 1 `shiftL` 9
+512
+> 512 `shiftR` 9
+1
+```
+你甚至可以定义一个 `(<<)` 运算符  
+```haskell
+> (<<) = shiftL
+> 1 << 9
+512
+```
+不过要注意的是，`(>>)` 被 Monad 使用了，定义 `(>>)` 运算符之前记得先隐藏 Prelude 中的 `(>>)` 运算符  
+
+# 链表
+Haskell 内置的列表就是一个链表实现  
+```haskell
+> :i []
+data [] a = [] | a : [a]
+```
+
+## 构造列表
+可以通过空列表的构造器 `[]` 和 连接列表的构造器 `(:)` 来构造一个列表  
+```haskell
+> 1:2:3:4:5:[]
+[1,2,3,4,5]
+```
+当然也可以直接 `[1, 2, 3, 4, 5]`  
+```haskell
+> [1, 2, 3, 4, 5]
+[1,2,3,4,5]
+```
+通过 `[begin..end]` 来构造一个区间  
+```haskell
+> [1..10]
+[1,2,3,4,5,6,7,8,9,10]
+```
+构造一个等差序列  
+```haskell
+> [1, 2..10]
+[1,2,3,4,5,6,7,8,9,10]
+> [1, 3..10]
+[1,3,5,7,9]
+```
+使用列表生成器  
+```haskell
+> [x | x <- [1..5], even x]
+[2,4]
+> [y | y <- [1..5], even y]
+[2,4]
+> [x + y | x <- [1..5], y <- [1..5], even x && even y]
+[4,6,6,8]
+```
+
+## 列表常用函数
+这里将介绍部分列表常用函数(同时也是对 [洛谷日报的 #188 期](https://www.luogu.org/blog/i-love-illya/haskell-ru-men-yu-fa-shou-ce) 的补充)
+
+名称(及函数签名) | 模块 | 作用
+--------------|------|-------
+head :: [a] -> a | Prelude | 取出列表的首元素
+last :: [a] -> a | Prelude | 取出列表的尾元素
+init :: [a] -> [a] | Prelude | 取出除了最后一个元素以外的元素
+tail :: [a] -> [a] | Prelude | 取出除了第一个元素以外的元素
+take :: Int -> [a] -> [a] | Prelude | 获取列表前 n 个元素
+drop :: Int -> [a] -> [a] | Prelude | 删除列表前 n 个元素
+(++) :: [a] -> [a] -> [a] | Prelude | 连接两个列表
+(!!) :: [a] -> Int -> a | Prelude | 随机访问
+elem :: (Foldable t, Eq a) => a -> t a -> Bool | Prelude | 检查目标元素是否存在于列表中
+length :: Foldable t => t a -> Int | Prelude | 返回列表长度
+map :: (a -> b) -> [a] -> [b] | Prelude | 对列表的每个元素应用函数，并返回函数结果的列表
+filter :: (a -> Bool) -> [a] -> [a] | Prelude | 过滤列表中元素
+reverse :: [a] -> [a] | Prelude | 翻转列表
+sort :: Ord a => [a] -> [a] | Data.List | 对列表排序(从小到大)
+sortBy :: (a -> a -> Ordering) -> [a] -> [a] | Data.List | 根据传入的比较函数对列表排序
+
 # IO Monad
 Haskell 是纯函数式语言，但 OI 中经常涉及读入输出操作，这些都是不纯的，应该怎么办呢  
 Haskell 给出了解决方案：`IO Monad`  
+
 ## 浅谈 Monad
 要理解 `IO Monad`，首先就要知道什么是 `Monad`  
 那什么是 `Monad` 呢？  
@@ -114,6 +290,7 @@ main = do
     putStrLn s
 ```
 这样就显得更加命令式了  
+`IO Monad` 的部分极为重要，无法掌握这部分知识代表着无法让 Haskell 程序与系统交互，从而也无法解决题目
 
 ## 输出
 你可以使用这两个函数来输出: `putStrLn` 和 `print`  
@@ -189,107 +366,8 @@ main = do
 
 这样，我们就完成了 Haskell 中的读入优化  
 
-# 基础操作
-一些基础内容可以看 [洛谷日报的 #188 期](https://www.luogu.org/blog/i-love-illya/haskell-ru-men-yu-fa-shou-ce)
-
-## 数值运算
-首先讲解对数值的操作  
-比如 `+-*/`  
-首先是 `(+) (-) (*)`  
-```haskell
-> :i Num
-class Num a where
-  (+) :: a -> a -> a
-  (-) :: a -> a -> a
-  (*) :: a -> a -> a
-
-  -- ...
-```
-
-它们都被定义在了 `Num` 类型类里  
-```haskell
-> 1 + 2
-2
-> 1 - 2
--1
-> 1 * 2
-2
-```
-
-接下来是 `(/)`  
-但是如果我们看一下 `(/)` 的定义。。。  
-```haskell
-class Num a => Fractional a where
-  (/) :: a -> a -> a
-  ...
-        -- Defined in ‘GHC.Real’
-infixl 7 /
-```
-需要 `Fractional` 类型类，我们再看看 `Fractional` 类型类的定义  
-```haskell
-> :i Fractional
-class Num a => Fractional a where
-  (/) :: a -> a -> a
-  -- ...
-instance Fractional Float -- Defined in ‘GHC.Float’
-instance Fractional Double -- Defined in ‘GHC.Float’
-```
-只有 `Float` 和 `Double` 实现了 `Fractional` 类型类  
-这就意味着，我们不能对 `Int` 使用 `(/)` 函数了！  
-
-但我们可以使用 `div`  
-```haskell
-> :i div
-class (Real a, Enum a) => Integral a where
-  div :: a -> a -> a
-infixl 7 `div`
-> :i Integral
-class (Real a, Enum a) => Integral a where
-  div :: a -> a -> a
-instance Integral Int -- Defined in ‘GHC.Real’
-```
-于是可以这样进行除操作  
-```haskell
-> div 5 2
-2
-```
-或者将 `div` 函数放在中间  
-```haskell
-> 5 `div` 2
-2
-```
-
-## 位运算
-位运算也是 OI 中很重要的知识  
-Haskell 的位运算函数都包含在了 Data.Bits 包中  
-```haskell
-import Data.Bits
-```
-使用 `(.&.) (.|.)` 和 `xor` 来进行 且 或 异或 操作
-```haskell
-> 2 .&. 1
-0
-> 2 .|. 1
-3
-> 2 `xor` 1
-3
-```
-使用 `shiftL` 和 `shiftR` 来进行位移  
-```haskell
-> 1 `shiftL` 9
-512
-> 512 `shiftR` 9
-1
-```
-你甚至可以定义一个 `(<<)` 运算符  
-```haskell
-> (<<) = shiftL
-> 1 << 9
-512
-```
-不过要注意的是，`(>>)` 被 Monad 使用了，定义 `(>>)` 运算符之前记得先隐藏 Prelude 中的 `(>>)` 运算符  
-
-# 数组  
+# 数组
+列表是链表实现，OI 中常常需要随机访问，所以列表并不胜任这份工作  
 虽然 Haskell 有内置的 Data.Array，但性能和易用性方面还是太差了  
 这里介绍 [vector 库](http://hackage.haskell.org/package/vector)  
 
@@ -588,6 +666,8 @@ main = do
 
     return ()
 ```
+
+虽然 Haskell 提供了 `IORef`，但我并不支持滥用 `IORef` 的行为 ~~(可以无视我说的话)~~  
 
 # 映射表
 映射表也是在 OI 中常用的一种数据结构  
