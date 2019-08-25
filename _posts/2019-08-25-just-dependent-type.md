@@ -116,7 +116,7 @@ data List a where
     Cons  :: a -> List a -> List a
 ```
 
-给栈加上长度信息
+给列表加上长度信息
 
 ```haskell
 data List n a where
