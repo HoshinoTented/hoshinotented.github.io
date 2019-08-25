@@ -64,9 +64,9 @@ blit = BLit
 
 ```haskell
 data Expr a where
-  ILit :: Int -> Expr Int
-  BLit :: Bool -> Expr Bool
-  Add  :: Expr Int -> Expr Int -> Expr Int
+    ILit :: Int -> Expr Int
+    BLit :: Bool -> Expr Bool
+    Add  :: Expr Int -> Expr Int -> Expr Int
 ```
 
 GADT 做了什么？似乎现在还看不太出来，试着在 GHCi 里查看 ILit 的类型：
@@ -76,7 +76,7 @@ GADT 做了什么？似乎现在还看不太出来，试着在 GHCi 里查看 IL
 ILit :: Int -> Expr Int
 ```
 
-我们发现 ILit 的返回值变成了 `Expr Int`，而不再是之前的 `Expr a`!
+我们发现 ILit 的返回值变成了 `Expr Int`，而不再是之前的 `Expr a`！
 
 这意味着 GADT 可以指定类型参数的准确类型，而不是模糊不清的 `a`
 
@@ -98,7 +98,7 @@ head' (Cons v _) = v
 
 ### 安全的列表
 
-使用 GADT，我们可以把长度信息附加在 Lit 上,
+使用 GADT，我们可以把长度信息附加在 List 上，
 就像在 C++ 里面的 `std::array` 使用了 `template` 一样  
 
 我们先用类型定义自然数
