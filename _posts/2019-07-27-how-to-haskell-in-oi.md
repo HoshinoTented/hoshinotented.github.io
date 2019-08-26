@@ -30,7 +30,7 @@ class Num a where
 它们都被定义在了 `Num` 类型类里  
 ```haskell
 > 1 + 2
-2
+3
 > 1 - 2
 -1
 > 1 * 2
