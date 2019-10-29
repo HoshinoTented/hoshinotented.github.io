@@ -186,7 +186,7 @@ class Applicative m => Monad (m :: * -> *) where
 ```
 
 单子和可应用函子有一些相同之处，比如都有相同功能的 `return` 和 `pure`。
-而 `(>>=)` 就像上面的 `ifJust` 函数，可以进行连续的运算并自动处理一些（上面则是 返回 Nothing 值来代表计算错误）。
+而 `(>>=)` 就像上面的 `ifJust` 函数，可以进行连续的运算并自动处理一些重复的动作（比如重复处理错误的检查）。
 
 ```haskell
 safeDiv (Div a b) = safeEval a >>= \a' ->
