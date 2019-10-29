@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 函子，可应用函子和单子
+title: 是类型类！还有函子，可应用函子和单子！
 post: YES!
 ---
 
@@ -71,7 +71,14 @@ Just 2
 Just 2
 ```
 
-让一个 Maybe Int 中的值加上 1 是简单的，但如果是想让两个 Maybe Int 相加呢？Functor 显然做不到这一点。
+既然能让一个 `Just 1` “加上” 1，那能不能让两个 Maybe Int 值相加呢？
+
+```haskell
+> :t (+) <$> Just 1
+(+) <$> Just 1 :: Num a => Maybe (a -> a)
+```
+
+会发现函数跑到魔法盒子里面去了，但我们目前似乎无法通过目前的任何方法把它取出来，或者应用到其他的值上。解决这个问题的，就是接下来要介绍的 Applicative。
 
 ## 可应用函子（Applicative）
 
@@ -103,3 +110,136 @@ Just 3
 
 ## 单子（Monad）
 
+假设你打算用 Haskell 写一个抽象语法树：
+
+```haskell
+data Expr = ILit Int
+    | Add Expr Expr
+    -- 省略无用的语法
+    | Div Expr Expr
+```
+
+然后需要对它们进行求值：
+
+```haskell
+eval :: Expr -> Int
+eval (ILit i) = i
+eval (Add a b) = eval a + eval b
+eval (Div a b) = eval a `div` eval b
+```
+
+但这明显有个问题，一旦作为除数的表达式结果为 0，那么这个表达式就会报错。
+能不能做到委婉地返回一个错误值，而不是强硬地报错呢？
+我们可以使用用来处理错误的类型：Maybe
+
+```haskell
+safeEval :: Expr -> Maybe Int
+safeEval (ILit i) = Just i
+safeEval (Add a b) = case safeEval a of
+                       Nothing -> Nothing
+                       Just a' -> case safeEval b of
+                         Nothing -> Nothing
+                         Just b' -> Just (a' + b')
+safeEval (Div a b) = case safeEval a of
+                       Nothing -> Nothing
+                       Just a' -> case safeEval b of
+                         Nothing -> Nothing
+                         Just b' -> if b' == 0 then Nothing else Just (a' `div` b')
+```
+
+但会发现，有许多重复代码：
+
+```haskell
+case something of
+  Nothing -> Nothing
+  Just m -> something'
+```
+
+于是，可以把这些重复代码提取出来，做成一个新的函数：
+
+```haskell
+ifJust :: Maybe a -> (a -> Maybe a) -> Maybe a
+ifJust Nothing _ = Nothing
+ifJust (Just a) f = f a
+```
+
+然后，就可以重新编写我们的 safeEval 函数：
+
+```haskell
+-- ...
+safeEval (Add a b) = ifJust (safeEval a) $ \a' -> 
+  ifJust (safeEval b) $ b' ->
+    Just $ a' + b'
+safeEval (Div a b) = ifJust (safeEval a) $ \a' -> 
+  ifJust (safeEval b) $ b' ->
+    if b' == 0
+      then Nothing
+      else Just $ a' + b'
+```
+
+而这个 `ifJust` 函数，就类似于单子的 `(>>=)`。
+
+```haskell
+class Applicative m => Monad (m :: * -> *) where
+  return :: a -> m a
+  (>>=) :: m a -> (a -> m b) -> m b
+```
+
+单子和可应用函子有一些相同之处，比如都有相同功能的 `return` 和 `pure`。
+而 `(>>=)` 就像上面的 `ifJust` 函数，可以进行连续的运算并自动处理一些（上面则是 返回 Nothing 值来代表计算错误）。
+
+```haskell
+safeDiv (Div a b) = safeEval a >>= \a' ->
+  safeEval b >>= \b' ->
+    if b' == 0
+      then Nothing
+      else Just $ a' `div` b'
+```
+
+文章最开始介绍到的 `Identity` 和 `State` 也都是 Monad。
+
+`Identity` 是最简单的 Monad，仅包含了一个值，而不做任何运算：
+
+```haskell
+> Identity 1 >>= \i -> Identity (i + 2)
+Identity 3
+> (+2) 1
+3
+```
+
+`State` 则较为复杂，以后的文章会做讲解。
+
+Haskell 还针对 `(>>=)` 设计了一个语法糖，能够看出 `(>>=)` 对纯函数式编程的重要性。
+
+```haskell
+foo :: IO ()
+foo = getLine >>= \s -> putStrLn s
+
+-- 等价于
+
+foo' :: IO ()
+foo' = do
+  s <- getLine
+  putStrLn s
+```
+
+Haskell 标准库还提供了两个函数：`liftM` 和 `ap`
+
+```haskell
+fmap :: Functor f => (a -> b) -> f a -> f b
+liftM :: Monad m => (a -> b) -> m a -> m b
+liftM f a = do
+  a' <- a
+
+  return (f a')
+
+(<*>) :: Applicative f => f (a -> b) -> f a -> f b
+ap :: Monad m => m (a -> b) -> m a -> m b
+ap f a = do
+  f' <- f
+  a' <- a
+
+  return (f' a')
+```
+
+很明显，Functor 的 fmap 和 Applicative 的 (<*>) 都可以用这两个函数来实现。
