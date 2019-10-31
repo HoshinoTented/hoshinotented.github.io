@@ -294,7 +294,7 @@ Just ((), [4])
 newtype MaybeT m a = MaybeT { runMaybeT :: m (Maybe a) }
 ```
 
-而在上面的代码中，这里的 m 是 `(State [a])`，则是 `State [a] (Maybe a)`，和单纯组合 State 与 Maybe 的签名一致了，不过多出来的强大功能则是自动处理了 Nothing 值。
+而在上面的代码中，这里的 m 是 `(State [a])`，最终类型则是 `State [a] (Maybe a)`，和单纯组合 State 与 Maybe 的签名一致了，不过多出来的强大功能则是自动处理了 Nothing 值。
 
 ## 先有 State 还是先有 StateT
 
