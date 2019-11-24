@@ -126,7 +126,7 @@ instance MonadState s (State s) where
   put s = State $ \_ -> ((), s)
 ```
 
-`get` 是获取当前状态，而 `push` 则是修改当前的状态，来看看要怎么用这两个函数：
+`get` 是获取当前状态，而 `put` 则是修改当前的状态，来看看要怎么用这两个函数：
 
 ```haskell
 push' :: a -> State [a] ()
