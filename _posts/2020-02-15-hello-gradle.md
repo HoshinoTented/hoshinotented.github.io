@@ -4,129 +4,149 @@ title: 你好，Gradle！
 post: YES!
 ---
 
+**前置知识：Java**
+
 Gradle 是一种构建工具，可以通过编写脚本来做到依赖管理等等……
 
 目前 Gradle 的脚本所支持的语言有 Groovy 和 Kotlin。
 
 > Groovy 支持大部分 Java 语法，所以完全可以把 Groovy 当做 Java 用
 
-## What Gradle can do?
+## Gradle 能做什么
 
-Gradle 的用途很广泛，许多项目都是通过 Gradle 构建的，比如 Android Studio 就使用 Gradle 作为默认的构建工具，Minecraft Forge 也使用 Gradle 来构建项目。
+* 管理依赖
+* 一键部署
+* 自动生成代码
+* 等等……
 
-## Gradle Project Structure
+Gradle 是一个很常用的工具，一般用于 JVM 开发，但是 Gradle 提供了插件系统，你可以开发自己的 Gradle 插件来支持其他你需要的语言。
+
+## 运行一个 Java 程序
+
+既然 Gradle 是一个构建工具，那应当能构建一个普通的项目。
+
+首先通过 `gradle init` 来创建一个普通的 Gradle 项目，会出现一些选项，这里我们选择：2-3-1-4-<回车>-<回车>
+
+之后会创建一个类似以下类型的项目：
 
 ```plain
 root
-  - gradle/             // 项目级别的 Gradle Wrapper 配置
-  - .gradle/
-  - src/                // 存放源代码（一般称作源集：SourceSet）的文件夹
-  - gradlew             // 和下面的批处理文件一样，是启动 Gradle 的脚本
-  - gradlew.bat
-  - build.gradle        // Gradle **模块**的脚本文件
-  - settings.gradle     // Gradle **项目**的配置文件
-                        // 一个 Gradle 项目只能有一个 settings.gradle，但可以有多个模块
+  - gradle/                 // Gradle Wrapper 目录
+  - src/                    // 源代码目录
+      - main/               // 应用代码目录
+          - java/           // Java 代码目录
+          - resources/      // 应用资源目录
+      - test/               // 测试代码目录
+          - java/           // Java 测试代码目录
+          - resources/      // 测试资源目录
+  - build.gradle            // 项目脚本文件
+  - settings.gradle         // 项目配置文件
+  - gradlew                 // gradlew 文件，用于启动项目级别的 Gradle
+  - gradlew.bat             // 同上，用于 Windows 平台
 ```
 
-## Gradle with Java
-
-配置 Java 项目是 Gradle 最常见的用途。
-
-你需要在 `build.gradle` 文件头加上以下内容：
-
-```groovy
-plugins {       // 配置插件的代码
-    id 'java'   // 添加 Java 插件
-}
-```
-
-在 `./src/main/java` 中添加 Java 源代码：
-
-`src/main/java/Main.java`
-
-```java
-public class Main {
-	public static void main(String[] args) {
-		System.out.println("Hello, world!");
-	}
-}
-```
-
-但是 Gradle 不知道要如何运行这些代码，于是需要用到 `application` 插件：
-
-`build.gradle`
+最重要的是 `build.gradle` 文件，来看看里面有什么：
 
 ```groovy
 plugins {
-    /* …… */
+    id 'java'
     id 'application'
 }
 
-application {       // 配置 application 插件
-    mainClassName = "Main"      // 配置主类
+repositories {
+    jcenter()
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.12'
+}
+
+application {
+    mainClassName = 'test.App'
 }
 ```
 
-随后在命令行中：
+首先是 `plugins { ... }`，这个是模块的插件配置代码，比如 `id 'java'` 就是应用了 `java` 插件。
+
+接着是 `repositories { ... }` 块，用于添加远端的依赖源，比如 `jcenter` 或者是 `mavenCentral()`。
+
+接下来是 `dependencies { ... }` 块，用于添加模块的依赖，会从上面配置的依赖源中查找依赖并自动下载。
+
+最后是 `application { ... }` 块，这是 `application` 插件的配置代码，`mainClassName` 字段代表了主类的全限定名，让 `application` 知道该从哪里启动程序。
+
+说了这么多，该说说怎么启动这个程序了：
 
 ```bash
 ./gradlew run
+```
 
+`run` 是 `application` 添加的一个 **任务（Task）**，`application { ... }` 块中的配置会引导这个任务找到主类，然后启动它：
+
+```plain
 > Task :run
-Hello, world!
+Hello world.
 
-BUILD SUCCESSFUL in 4s
+BUILD SUCCESSFUL in 7s
+2 actionable tasks: 2 executed
 ```
 
-很正常地运行了代码。
+发现输出了 “Hello world.”，我们成功地启动这个程序了！
 
-## Dependencies Manage by Gradle
+## 管理依赖
 
-Gradle 的另一个重要功能是依赖管理，可以通过一行代码向项目中添加依赖：
+在实际开发中，通常需要很多第三方库 ~~来避免造轮子~~，但是去网上找 jar 然后下载下来太麻烦了，怎么办呢？
 
-`build.gradle`
+答案是：使用 Gradle。
+
+假如我们需要 Gson 库（Google 开发的 JSON 解析库），于是可以在 `build.gradle` 的 `dependencies { ... }` 块中添加如下代码：
 
 ```groovy
-repositories {      // 配置依赖源
-    mavenCentral()  // maven 中心仓库
-}
-
-dependencies {      // 配置依赖
-    implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.6'        // 添加 gson 依赖，版本为 2.8.6
+dependencies {
+    compile 'com.google.code.gson:gson:2.8.6'
 }
 ```
 
-接着就可以在源代码中使用 Gson 库各种功能了：
+如果你曾经用过 Maven，那么这段代码与 Maven 中的：
 
-```java
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
-
-public class Main {
-	public static void main(String[] args) {
-		String json = "{ \"hoshino\": \"cute\" }";
-		JsonElement elem = JsonParser.parseString(json);
-
-		System.out.println(elem.getAsJsonObject().get("hoshino").getAsString());
-	}
-}
+```xml
+<dependency>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>2.8.6</version>
+</dependency>
 ```
 
-## Task and task
+是一样的，但是 Gradle 的会更加简洁一些，并且可以通过代码动态控制版本或者是其他的东西。
 
-Gradle 的一个重要元素就是 **任务(task)**，可以通过以下方式创建一个任务：
+在这里需要注意一下 `compile`，Gradle 提供了许多应用依赖的方式：
 
-`build.gradle`
+* compile：在高版本 Gradle 中将被废弃，请使用 `api` 代替
+* api：对当前模块和引用该模块的其他模块都可见
+* implementation：仅对当前模块可见
+
+`api` 一般用于库项目，而 `implementation` 一般用于应用项目。
+
+## 任务系统
+
+除了管理依赖，另一个 Gradle 的功能就是 **任务系统** 了：
+
+通过 `task` 创建一个任务：
 
 ```groovy
-// Groovy Style
-task hello {
-    doFirst {
-        println "Hello, Groovy!"
+// Groovy 风格
+task hello {                    // 创建一个 “hello” 任务
+    println 'hello'             // **配置** 任务
+
+    doLast {                    // 在任务最后执行
+        println 'last'  
+    }
+
+    doFirst {                   // 在任务一开始执行
+        println 'first'
     }
 }
 
-// Java Style
+// Java 风格
 task("hello-java", new Action<Task>() {
     @Override
     void execute(Task task) {
@@ -137,141 +157,140 @@ task("hello-java", new Action<Task>() {
 })
 ```
 
-随后在同目录中，使用命令：
+随后可以通过命令 `./gradlew hello` 来调用任务
 
-```bash
-./gradlew hello
-```
-
-和
-
-```bash
-./gradlew hello-java
-```
-
-任务之间还可以有依赖关系：
-
-```groovy
-task("hello-java", /* …… */).dependsOn(hello)
-```
-
-这样子，调用 `hello-java` 之前就会先调用 `hello`：
-
-```bash
-./gradlew hello-java
+```plain
+> Configure project :
+hello
 
 > Task :hello
-Hello, Groovy!
+first
+last
+
+BUILD SUCCESSFUL in 18s
+1 actionable task: 1 executed
+```
+
+会输出类似以上内容。
+
+需要注意的是，**配置**任务在每次调用 root 项目的 build.gradle 时都会执行，即使没有调用 hello 任务：
+
+```plain
+> ./gradlew hello-java
+
+Configuration on demand is an incubating feature.
+
+> Configure project :
+hello
 
 > Task :hello-java
 Hello, Java!
 
 BUILD SUCCESSFUL in 3s
+1 actionable task: 1 executed
 ```
 
-## Gradle with C++
+### 有向无环图
 
-在开头就说过了，Gradle 的用途非常广泛，除了构建 Java 项目，还可以构建 C++ 项目：
-
-和 Java 项目一样，需要添加 C++ 的插件：
-
-`build.gradle`
+一些任务通常需要依赖其他任务，比如吃东西前需要拿到食物和张嘴：
 
 ```groovy
-plugins {
-    id 'cpp-appliction'
+task tabemono {
+    doLast {
+        println 'Get Tabemono'
+    }
 }
 
-application {
-    targetMachines.add(machines.windows.x86_64)
+task openmouth {
+    doLast {
+        println 'Opened Mouth'
+    }
+}
+
+task eat {
+    dependsOn tabemono, openmouth           // 使用 dependsOn 函数进行任务依赖
+
+    doLast {
+        println 'Oishii!'
+    }
 }
 ```
 
-或者直接使用 `gradle init` 来创建 C++ 项目。
+```plain
+./gradlew eat
 
-随后使用 `./gradlew build` 命令进行构建。构建完毕后，会在 `./build/exe/` 目录下生成可执行文件。
+> Configure project :
+hello
 
-~~不过不怎么好用，还是老老实实用 CMake 吧~~
+> Task :openmouth
+Opened Mouth
 
-## Multi Module
+> Task :tabemono
+Get Tabemono
 
-Gradle 还支持模块化，为不同的功能创建不同的模块，最后统一导入到主模块中。
+> Task :eat
+Oishii!
 
-`settings.gradle`
-
-```groovy
-include ':lib'
+BUILD SUCCESSFUL in 3s
+3 actionable tasks: 3 executed
 ```
 
-接着创建一个 `lib` 文件夹，并创建对应的 `build.gradle` 文件：
+## 项目的海洋
+
+Gradle 还支持子项目：
 
 ```plain
 root
-  - lib/
-      - src/
-      - build.gradle
-  - build.gradle
+  - build.gradle                // root 项目的配置文件
+  - settings.gradle
+  - sub
+      - build.gradle            // sub 项目的配置文件
 ```
 
-同样向 `lib` 模块的 `build.gradle` 中添加插件：
+随后在 `settings.gradle` 中：
 
-`lib/build.gradle`
+```groovy
+include ':sub'          // 导入 sub 项目
+```
+
+`sub/build.gradle`
+
+```groovy
+task subhello {
+    doLast {
+        println 'I am a subproject!'
+    }
+}
+```
+
+```plain
+> ./gradlew :sub:subhello
+
+> Task :sub:subhello
+I am a subproject!
+
+BUILD SUCCESSFUL in 16s
+1 actionable task: 1 executed
+```
+
+### 地图炮
+
+有的时候需要对一堆子项目配置相同的内容，可以使用 `subprojects`：
+
+`build.gradle`
 
 ```groovy
 plugins {
     id 'java'
 }
-```
 
-`lib/src/main/java/Lib.java`
-
-```java
-public class Lib {
-    public static void foo() {
-        System.out.println("Hello, world!");
-    }
-}
-```
-
-在主模块中添加对子模块的依赖：
-
-`build.gradle`
-
-```groovy
-dependencies {
-    implementation project(':lib')
-}
-```
-
-`src/main/java/Main.java`
-
-```java
-public class Main {
-	public static void main(String[] args) {
-		Lib.foo();      // 引用 lib 模块的内容
-	}
-}
-```
-
-使用 `./gradlew run` 命令之后，输出了预期的内容。
-
-不过，一旦子模块多了起来，就要向每个子模块中添加 Java 插件，很麻烦。
-所以，可以使用 `allprojects` 和 `subprojects` 函数，来进行统一配置：
-
-`build.gradle`
-
-```groovy
 subprojects {
-    apply plugin: 'java'        // 注意，在 allprojects 和 subprojects 模块中，不能使用 plugins 块。
+    apply plugin: 'java'            // plugins 只能在顶层使用，在其他地方需要使用 apply 函数
 }
 ```
-
-然后删去 `lib/build.gradle`，再次运行，输出了预期的内容。
 
 ## 最后
 
-Gradle 是一种很强大的构建工具，如果你使用的是运行在 JVM 上的语言，并且对工程很有兴趣的话，Gradle 是一个不错的技能点。
+参考：
 
-## 小建议
-
-推荐使用 IntelliJ IDEA 作为 IDE。
+* [Gradle](https://gradle.org)
