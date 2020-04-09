@@ -228,7 +228,7 @@ indexing: ArrStart rightValue ArrEnd;                           // 数组索引�
 
 funCall: Colon Symbol parameter?;                               // 函数调用规则 :yosoro 1, a
 parameter: rightValue | rightValue (Comma rightValue)*;         // 参数规则 1, a
-leftValue: Symbol | leftValue indexing;                         // 左值规则 1, a, arr[1][2]
+leftValue: Symbol | leftValue indexing;                         // 左值规则 a, arr[1][2]
 formulaValue : leftValue | Digit | funCall;                     // 算术值规则，仅用于二元运算解析用
 rightValue: formulaValue | formula;                             // 右值规则，包含函数调用
 formula: formulaValue formula_;                                 // 二元运算规则
