@@ -14,7 +14,7 @@ post: YES!
 解析语法有两个重要的概念：词法解析器（Lexer）和语法解析器（Parser）
 
 词法解析器一般是将源代码（例如字符串）转化为 Token，这是为了方便 Parser 解析：
-例如 `foo(1, "2")` 转换成 `Symbol(foo) LB Number(1) COMMA String("2") RB`，
+例如字符串 `foo(1, "2")` 转换成 Token 列表 `Symbol(foo) LB Number(1) COMMA String("2") RB`，
 将难以解析的字符按照某种特定的语法去处理成单独的 Token。
 
 而语法解析器就是将 Token 转化为抽象语法树（**A**bstract **S**yntax **T**ree），或许某些人有见过表达式树：
