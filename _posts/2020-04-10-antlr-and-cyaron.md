@@ -187,3 +187,79 @@ WS: [\n\t\r ]+ -> skip;
 ```
 
 比较特别的是最后两个，`-> skip` 代表这两个 Token 会被 Parser 忽略。
+
+接下来是规则部分，按照题目的代码示例，先实现定义变量部分：
+
+```antlr
+definitionBlock:
+    BlockStart Vars
+    definitionLine*
+    BlockEnd
+```
+
+接下来是变量定义的 **行** 部分：
+
+```antlr
+definitionLine:
+    WS* Symbol Colon type
+```
+
+好像因为 `*` 是连续的 规则，中间不能夹杂其他东西，所以要手动加上 `WS*`。不过行尾没加也不会报错，可能是某些奇妙的魔法……
+
+类型：
+
+```antlr
+typeInt: Int;
+typeArray: Array ArrStart type Comma Digit To Digit ArrEnd;
+type: typeInt | typeArray;
+```
+
+函数调用：
+
+```antlr
+opt: Plus | Minus;                                              // 二元运算符
+indexing: ArrStart rightValue ArrEnd;                           // 数组索引规则 [1]
+
+funCall: Colon Symbol parameter?;                               // 函数调用规则 :yosoro 1, a
+parameter: rightValue | rightValue (Comma rightValue)*;         // 参数规则 1, a
+leftValue: Symbol | leftValue indexing;                         // 左值规则 1, a, arr[1][2]
+formulaValue : leftValue | Digit | funCall;                     // 算术值规则，仅用于二元运算解析用
+rightValue: formulaValue | formula;                             // 右值规则，包含函数调用
+formula: formulaValue formula_;                                 // 二元运算规则
+formula_: (opt formula formula_)?;
+```
+
+表达式块：
+
+```antlr
+statementLine: WS* (funCall | definitionBlock | ifBlock | whileBlock | forBlock);       // 单行代码
+statement: statementLine*;                                                              // 多行代码
+```
+
+if、for、while 块：
+
+```antlr
+condOpt: LT | GT | LE | GE | EQ | NEQ;                      // 条件运算符
+cond: condOpt Comma rightValue Comma rightValue;            // 条件规则
+forCond: rightValue Comma rightValue Comma rightValue;      // for 块条件规则
+
+// if 块
+ifBlock:
+    BlockStart If cond
+    statement
+    BlockEnd;
+
+// while 块
+whileBlock:
+    BlockStart While cond
+    statement
+    BlockEnd;
+
+// for 块
+forBlock:
+    BlockStart For forCond
+    statement
+    BlockEnd;
+```
+
+这些就是瞎龙语言的全部语法代码了，statement 也可以作为整个文件的根规则进行解析。
