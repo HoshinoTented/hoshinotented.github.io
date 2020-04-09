@@ -131,6 +131,9 @@ add: add + mul | mul;
 exp: add;
 add: mul add_;
 add_: (Add add add_)?;
+mul: number mul_;
+mul_: (Mul number mul_)?;
+number: Number
 ```
 
 在[维基百科](https://zh.wikipedia.org/zh-cn/%E5%B7%A6%E9%81%9E%E6%AD%B8)有更详细的说明。
