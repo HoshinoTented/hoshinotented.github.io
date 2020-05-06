@@ -176,7 +176,7 @@ fn main() {
 Person { name: "Hoshino", age: 4, gender: Trans { from: Male, to: Female } }
 ```
 
-## (De)Serializing When (De)Serializeing
+## (De)Serializing When (De)Serializing
 
 如果要把生理性别和心理性别分开来的话：
 
