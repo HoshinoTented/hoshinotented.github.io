@@ -176,6 +176,83 @@ fn main() {
 Person { name: "Hoshino", age: 4, gender: Trans { from: Male, to: Female } }
 ```
 
+## (De)Serializing When (De)Serializeing
+
+如果要把生理性别和心理性别分开来的话：
+
+```rust
+#[serde(rename_all = "lowercase")]              // 使用 rename_all 将所有枚举值重命名为小写
+#[derive(Debug, Deserialize, Serialize)]        // 这里使用 derive 简化代码，Sex 的序列化不是本节要讨论的内容
+pub enum Sex {
+    Female,
+    Male,
+}
+
+#[derive(Debug)]
+pub enum Gender {
+    Common(Sex),            // 常见的心理性别
+    Neither,                // 无性
+    Both,                   // 双性（或者中性）
+    Trans(Sex)              // 跨性别
+}
+```
+
+实现 Gender 的序列化：
+
+```rust
+impl Serialize for Gender {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error> where
+        S: Serializer {
+        let str = match self {
+            Gender::Common(sex) => return sex.serialize(serializer),        // 将序列化器交给 sex 进行序列化（注意：serialize 会吃掉所有权）
+            Gender::Neither => "none",
+            Gender::Both => "both",
+            Gender::Trans(Sex::Female) => "ftm",
+            Gender::Trans(Sex::Male) => "mtf",
+        };
+
+        serializer.serialize_str(str)
+}
+
+impl <'de> Deserialize<'de> for Gender {
+    fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error> where
+        D: Deserializer<'de> {
+        struct GenderVisitor;
+
+        impl <'de> Visitor<'de> for GenderVisitor {
+            type Value = Gender;
+
+            fn expecting<'a>(&self, formatter: &mut Formatter<'a>) -> std::fmt::Result {
+                formatter.write_str("expect female, male, none, both, mtf and ftm")
+            }
+
+            fn visit_str<E>(self, v: &str) -> Result<Self::Value, E> where
+                E: DeError, {
+                // 这里需要显式标注，否则会出现编译错误
+                let der: StringDeserializer<E> = v.to_string().into_deserializer();     // 将基础类型 str 转换为反序列化器
+                let try_common = Sex::deserialize(der);     // 调用 Sex 的反序列化函数，返回 Result
+
+                let result = match try_common {             // 对 Result 进行模式匹配
+                    Ok(sex) => Gender::Common(sex),         // 反序列化成功，构造 Common
+                    Err(_) => match v {                     // 反序列化失败，匹配其他值
+                        "none" => Gender::Neither,
+                        "both" => Gender::Both,
+                        "mtf" => Gender::Trans(Sex::Male),
+                        "ftm" => Gender::Trans(Sex::Female),
+
+                        _ => Err(E::custom(format!("unexpected {}", v)))?,
+                    }
+                };
+
+                Ok(result)
+            }
+        }
+
+        deserializer.deserialize_str(GenderVisitor)
+    }
+}
+```
+
 ## 最后
 
 serde 不仅能（反）序列化为 JSON，还有 YAML，TOML 等多种语言，可以在 serde 的[官方文档](https://serde.rs)中找到它们。
